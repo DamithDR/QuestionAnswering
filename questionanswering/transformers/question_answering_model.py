@@ -70,13 +70,13 @@ from transformers import (
     XLNetTokenizer,
 )
 
-from questionanswering.simpletransformers.config.model_args import QuestionAnsweringArgs
-from questionanswering.simpletransformers.config.utils import sweep_config_to_sweep_values
-from questionanswering.simpletransformers.custom_models.models import (
+from questionanswering.transformers.config.model_args import QuestionAnsweringArgs
+from questionanswering.transformers.config.utils import sweep_config_to_sweep_values
+from questionanswering.transformers.custom_models.models import (
     ElectraForQuestionAnswering,
     XLMRobertaForQuestionAnswering,
 )
-from questionanswering.simpletransformers.question_answering_utils import (
+from questionanswering.transformers.question_answering_utils import (
     LazyQuestionAnsweringDataset,
     RawResult,
     RawResultExtended,
@@ -675,7 +675,7 @@ class QuestionAnsweringModel:
                 config={**asdict(args)},
                 **args.wandb_kwargs,
             )
-            wandb.run._label(repo="simpletransformers")
+            wandb.run._label(repo="transformers")
             wandb.watch(self.model)
             self.wandb_run_id = wandb.run.id
 

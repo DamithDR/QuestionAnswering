@@ -163,7 +163,7 @@ class BertweetForMultiLabelSequenceClassification(
 ):
     """
     BERTweet model adapted for multi-label sequence classification.
-    BERTweet shares the Roberta architecture, so we can reuse the simpletransformers
+    BERTweet shares the Roberta architecture, so we can reuse the transformers
     RobertaForMultiLabelSequenceClassification implementation
     """
 
@@ -175,7 +175,7 @@ class CamembertForMultiLabelSequenceClassification(
 ):
     """
     Camembert model adapted for multi-label sequence classification.
-    Camembert shares the Roberta architecture, so we can reuse the simpletransformers
+    Camembert shares the Roberta architecture, so we can reuse the transformers
     RobertaForMultiLabelSequenceClassification implementation, as it is done in
     the transformers library
     (https://github.com/huggingface/transformers/blob/master/src/transformers/modeling_camembert.py).
