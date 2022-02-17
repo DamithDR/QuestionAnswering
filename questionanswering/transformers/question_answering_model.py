@@ -413,7 +413,7 @@ class QuestionAnsweringModel:
             )
 
         self._move_model_to_device()
-
+        train_examples = []
         if self.args.use_hf_datasets:
             train_dataset = load_hf_dataset(
                 train_data, self.tokenizer, self.args, is_training=True
@@ -429,8 +429,10 @@ class QuestionAnsweringModel:
                 )
         else:
             if isinstance(train_data, str):
-                with open(train_data, "r", encoding=self.args.encoding) as f:
-                    train_examples = json.load(f)
+                # changed encoding to utf-8
+                with open(train_data, "r", encoding="utf-8") as f:
+                    for line in f.readlines():
+                        train_examples.append(json.loads(line))
             else:
                 train_examples = train_data
 
@@ -1087,9 +1089,11 @@ class QuestionAnsweringModel:
             eval_data, output_dir, verbose_logging=verbose
         )
 
+        truth = []
         if isinstance(eval_data, str):
-            with open(eval_data, "r", encoding=self.args.encoding) as f:
-                truth = json.load(f)
+            with open(eval_data, "r", encoding="utf-8") as f:
+                for line in f:
+                    truth.append(json.loads(line))
         else:
             truth = eval_data
 
@@ -1112,10 +1116,12 @@ class QuestionAnsweringModel:
         tokenizer = self.tokenizer
         model = self.model
         args = self.args
+        eval_examples = []
 
         if isinstance(eval_data, str):
-            with open(eval_data, "r", encoding=self.args.encoding) as f:
-                eval_examples = json.load(f)
+            with open(eval_data, "r", encoding="utf-8") as f:
+                for line in f.readlines():
+                    eval_examples.append(json.loads(line))
         else:
             eval_examples = eval_data
 
