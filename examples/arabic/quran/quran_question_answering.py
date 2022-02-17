@@ -42,9 +42,14 @@ from questionanswering.transformers.question_answering_model import QuestionAnsw
 
 if __name__ == '__main__':
     # Create the QuestionAnsweringModel
+    # model = QuestionAnsweringModel(
+    #     "bert",
+    #     "aubmindlab/bert-base-arabertv2",
+    #     args={"reprocess_input_data": True, "overwrite_output_dir": True},
+    # )
     model = QuestionAnsweringModel(
         "bert",
-        "aubmindlab/bert-base-arabertv2",
+        "CAMeL-Lab/bert-base-arabic-camelbert-mix",
         args={"reprocess_input_data": True, "overwrite_output_dir": True},
     )
 
@@ -52,7 +57,7 @@ if __name__ == '__main__':
     model.train_model(".\data\preprocess\output\qrcd_v1.1_train_formatted.jsonl")
 
     # Evaluate the model. (Being lazy and evaluating on the train data itself)
-    result, text = model.eval_model(".\data\preprocess\output\qrcd_v1.1_train_formatted.jsonl")
+    result, text = model.eval_model(".\data\preprocess\output\qrcd_v1.1_dev_formatted.jsonl")
 
     print(result)
     print(text)
