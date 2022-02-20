@@ -3,6 +3,7 @@ import os
 
 from questionanswering.transformers.question_answering_model import QuestionAnsweringModel
 
+
 # Create dummy data to use for training.
 # train_data = [
 #     {
@@ -40,17 +41,20 @@ from questionanswering.transformers.question_answering_model import QuestionAnsw
 # with open("data/train.json", "w") as f:
 #     json.dump(train_data, f)
 
-if __name__ == '__main__':
-    # Create the QuestionAnsweringModel
-    # model = QuestionAnsweringModel(
-    #     "bert",
-    #     "aubmindlab/bert-base-arabertv2",
-    #     args={"reprocess_input_data": True, "overwrite_output_dir": True},
-    # )
+def run(
+        learning_rate=4e-5,
+        num_train_epochs=1,
+        manual_seed=None,
+        model="CAMeL-Lab/bert-base-arabic-camelbert-mix"
+):
     model = QuestionAnsweringModel(
         "bert",
-        "CAMeL-Lab/bert-base-arabic-camelbert-mix",
-        args={"reprocess_input_data": True, "overwrite_output_dir": True},
+        model,
+        args={"reprocess_input_data": True,
+              "overwrite_output_dir": True,
+              "learning_rate": learning_rate,
+              "manual_seed": manual_seed,
+              "num_train_epochs": num_train_epochs},
     )
 
     # Train the model
@@ -64,12 +68,8 @@ if __name__ == '__main__':
 
     print("-------------------")
 
-    # # Making predictions using the model.
-    # to_predict = [
-    #     {
-    #         "context": "This is the context used for demonstrating predictions.",
-    #         "qas": [{"question": "What is this context?", "id": "0"}],
-    #     }
-    # ]
-    #
-    # print(model.predict(to_predict))
+    return result, text
+
+
+if __name__ == '__main__':
+    run()
