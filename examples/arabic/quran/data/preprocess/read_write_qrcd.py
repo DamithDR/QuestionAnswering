@@ -34,13 +34,16 @@ def dump_jsonl(data, output_path, append=False):
 class Qas():
     ansId = 0
 
-    def __init__(self, dictionary) -> None:
+    def __init__(self, dictionary,pq_id) -> None:
         self.id = None
         self.is_impossible = None
         self.question = None
         self.answers = []
         Qas.ansId += 1
-        self.id = '{:0>5}'.format(self.ansId)
+        if pq_id is None:
+            self.id = '{:0>5}'.format(self.ansId)
+        else:
+            self.id = pq_id
         self.question = dictionary["question"]
         for answer in dictionary["answers"]:
             self.answers.append(Answer(answer))
@@ -48,7 +51,6 @@ class Qas():
             self.is_impossible = False
         else:
             self.is_impossible = True
-
 
     def to_dict(self) -> dict:
         qa_dict = {
@@ -59,6 +61,12 @@ class Qas():
         }
         return qa_dict
 
+    def to_test_dict(self) -> dict:
+        qa_dict = {
+            "id": self.id,
+            "question": self.question,
+        }
+        return qa_dict
 
 class Answer():
     def __init__(self, dictionary) -> None:
@@ -111,16 +119,28 @@ class PassageQuestion():
 class FormattedPassageQuestion():
     def __init__(self, dictionary) -> None:
         self.passage = None
+        self.pq_id = None
         self.qas = []
         self.passage = dictionary["passage"]
-        self.qas.append(Qas(dictionary))
+        self.pq_id = dictionary["pq_id"]
+        self.qas.append(Qas(dictionary,self.pq_id),)
 
     def to_dict(self) -> dict:
         passge_question_dict = {
+            "pq_id": self.pq_id,
             "context": self.passage,
             "qas": [x.to_dict() for x in self.qas]
         }
         return passge_question_dict
+
+    def to_test_dict(self) -> dict:
+        passge_question_dict = {
+            "pq_id": self.pq_id,
+            "context": self.passage,
+            "qas": [x.to_test_dict() for x in self.qas]
+        }
+        return passge_question_dict
+
 
 
 def read_JSONL_file(file_path) -> list:
@@ -149,7 +169,6 @@ def read_JSONL_file_formatted(file_path) -> list:
     print(f"Collected {len(passage_question_objects)} Object from {file_path}")
     return passage_question_objects
 
-
 def write_to_JSONL_file(passage_question_objects, output_path) -> None:
     # list of dictionaries for the passage_question_objects
     dict_data_list = []
@@ -158,6 +177,21 @@ def write_to_JSONL_file(passage_question_objects, output_path) -> None:
         dict_data_list.append(dict_data)
     dump_jsonl(dict_data_list, output_path)
 
+def write_test_set_to_JSONL_file(passage_question_objects, output_path) -> None:
+    # list of dictionaries for the passage_question_objects
+    dict_data_list = []
+    for pq_object in passage_question_objects:
+        dict_data = pq_object.to_test_dict()
+        dict_data_list.append(dict_data)
+    dump_jsonl(dict_data_list, output_path)
+
+def format_training_set(input_file, output_file):
+    passage_question_objects = read_JSONL_file_formatted(input_file)
+    write_to_JSONL_file(passage_question_objects, output_file)
+
+def format_dev_set(input_file, output_file):
+    passage_question_objects = read_JSONL_file_formatted(input_file)
+    write_test_set_to_JSONL_file(passage_question_objects, output_file)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

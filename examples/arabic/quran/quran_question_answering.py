@@ -1,45 +1,13 @@
 import json
 import os
+from os.path import exists
 
+from examples.arabic.quran.quranqa22_eval import check_and_evaluate
 from questionanswering.transformers.question_answering_model import QuestionAnsweringModel
+from examples.arabic.quran.data.preprocess.read_write_qrcd import format_training_set
+from examples.arabic.quran.data.preprocess.read_write_qrcd import format_dev_set
+from examples.arabic.quran.data.preprocess.read_write_qrcd import load_jsonl
 
-
-# Create dummy data to use for training.
-# train_data = [
-#     {
-#         "context": "This is the first context",
-#         "qas": [
-#             {
-#                 "id": "00001",
-#                 "is_impossible": False,
-#                 "question": "Which context is this?",
-#                 "answers": [{"text": "the first", "answer_start": 8}],
-#             }
-#         ],
-#     },
-#     {
-#         "context": "Other legislation followed, including the Migratory Bird Conservation Act of 1929, a 1937 treaty prohibiting the hunting of right and gray whales,            and the Bald Eagle Protection Act of 1940. These later laws had a low cost to society—the species were relatively rare—and little opposition was raised",
-#         "qas": [
-#             {
-#                 "id": "00002",
-#                 "is_impossible": False,
-#                 "question": "What was the cost to society?",
-#                 "answers": [{"text": "low cost", "answer_start": 225}],
-#             },
-#             {
-#                 "id": "00003",
-#                 "is_impossible": False,
-#                 "question": "What was the name of the 1937 treaty?",
-#                 "answers": [{"text": "Bald Eagle Protection Act", "answer_start": 167}],
-#             },
-#         ],
-#     },
-# ]
-#
-# # Save as a JSON file
-# os.makedirs("data", exist_ok=True)
-# with open("data/train.json", "w") as f:
-#     json.dump(train_data, f)
 
 def run(
         learning_rate=4e-5,
@@ -47,6 +15,18 @@ def run(
         manual_seed=None,
         model="CAMeL-Lab/bert-base-arabic-camelbert-mix"
 ):
+    raw_training_set_path = os.path.join(".", "data", "qrcd_v1.1_train.jsonl")
+    training_set_path = os.path.join(".", "data", "preprocess", "output", "qrcd_v1.1_train_formatted.jsonl")
+    raw_dev_set_path = os.path.join(".", "data", "qrcd_v1.1_dev.jsonl")
+    dev_set_path = os.path.join(".", "data", "preprocess", "output", "qrcd_v1.1_dev_formatted.jsonl")
+    results_file = os.path.join(".", "data","run-files", "DTW_run01.json")
+
+    if not exists(training_set_path):
+        format_training_set(raw_training_set_path, training_set_path)
+
+    if not exists(dev_set_path):
+        format_dev_set(raw_dev_set_path, dev_set_path)
+
     model = QuestionAnsweringModel(
         "bert",
         model,
@@ -58,17 +38,30 @@ def run(
     )
 
     # Train the model
-    model.train_model(".\data\preprocess\output\qrcd_v1.1_train_formatted.jsonl")
+    model.train_model(training_set_path)
+    # result, text = model.eval_model(".\data\preprocess\output\qrcd_v1.1_dev_formatted.jsonl")
+    # make predictions
+    dev_set = load_jsonl(dev_set_path)
 
-    # Evaluate the model. (Being lazy and evaluating on the train data itself)
-    result, text = model.eval_model(".\data\preprocess\output\qrcd_v1.1_dev_formatted.jsonl")
+    answers, scores, ans_with_scores = model.predict(dev_set, n_best_size=3)
+    results_dict = {}
+    for result in ans_with_scores:
+        ans_score_list = []
+        rank = 1
+        for i in range(0, len(result['answer'])):
+            if len(result['answer'][i].strip()) != 0:
+                record = {'answer': result['answer'][i], 'rank': rank, 'score': result['probability'][i]}
+                ans_score_list.append(record)
+                rank += 1
+        results_dict[result['id']] = ans_score_list
 
-    print(result)
-    print(text)
+    # dump_jsonl(results_dict, results_file)
+    with open(results_file, "w", encoding="utf-8") as outfile:
+        json.dump(results_dict, outfile, ensure_ascii=False)
 
-    print("-------------------")
+    check_and_evaluate(run_file=results_file, gold_answers_file=raw_dev_set_path)
 
-    return result, text
+    return answers
 
 
 if __name__ == '__main__':

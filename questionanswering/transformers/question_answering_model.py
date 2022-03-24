@@ -1397,8 +1397,12 @@ class QuestionAnsweringModel:
             {"id": answer["id"], "probability": answer["probability"][:-1]}
             for answer in answers
         ]
+        ans_with_probability = [
+            {"id": answer["id"], "answer": answer["answer"][:-1], "probability": answer["probability"][:-1], }
+            for answer in answers
+        ]
 
-        return answer_list, probability_list
+        return answer_list, probability_list, answers
 
     def calculate_results(self, truth, predictions, **kwargs):
         truth_dict = {}
