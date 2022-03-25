@@ -6,6 +6,9 @@ A script to:
 """
 import json, argparse
 
+from farasa.diacratizer import FarasaDiacritizer
+
+farasa_diacritizer = FarasaDiacritizer(interactive=True)
 
 def load_jsonl(input_path) -> list:
     """
@@ -34,7 +37,7 @@ def dump_jsonl(data, output_path, append=False):
 class Qas():
     ansId = 0
 
-    def __init__(self, dictionary,pq_id) -> None:
+    def __init__(self, dictionary, pq_id) -> None:
         self.id = None
         self.is_impossible = None
         self.question = None
@@ -52,21 +55,36 @@ class Qas():
         else:
             self.is_impossible = True
 
-    def to_dict(self) -> dict:
-        qa_dict = {
-            "id": self.id,
-            "is_impossible": self.is_impossible,
-            "question": self.question,
-            "answers": [ans.to_dict_formatted() for ans in self.answers]
-        }
+    def to_dict(self, diacritized=False) -> dict:
+        if diacritized:
+            qa_dict = {
+                "id": self.id,
+                "is_impossible": self.is_impossible,
+                "question": farasa_diacritizer.diacritize(self.question),
+                "answers": [ans.to_dict_formatted(diacritized) for ans in self.answers]
+            }
+        else:
+            qa_dict = {
+                "id": self.id,
+                "is_impossible": self.is_impossible,
+                "question": self.question,
+                "answers": [ans.to_dict_formatted() for ans in self.answers]
+            }
         return qa_dict
 
-    def to_test_dict(self) -> dict:
-        qa_dict = {
-            "id": self.id,
-            "question": self.question,
-        }
+    def to_test_dict(self, diacritized=False) -> dict:
+        if diacritized:
+            qa_dict = {
+                "id": self.id,
+                "question": farasa_diacritizer.diacritize(self.question),
+            }
+        else:
+            qa_dict = {
+                "id": self.id,
+                "question": self.question,
+            }
         return qa_dict
+
 
 class Answer():
     def __init__(self, dictionary) -> None:
@@ -80,11 +98,17 @@ class Answer():
         }
         return answer_dict
 
-    def to_dict_formatted(self) -> dict:
-        answer_dict = {
-            "text": self.text,
-            "answer_start": self.start_char
-        }
+    def to_dict_formatted(self,diacritized) -> dict:
+        if diacritized:
+            answer_dict = {
+                "text": farasa_diacritizer.diacritize(self.text),
+                "answer_start": self.start_char
+            }
+        else:
+            answer_dict = {
+                "text": self.text,
+                "answer_start": self.start_char
+            }
         return answer_dict
 
 
@@ -123,24 +147,37 @@ class FormattedPassageQuestion():
         self.qas = []
         self.passage = dictionary["passage"]
         self.pq_id = dictionary["pq_id"]
-        self.qas.append(Qas(dictionary,self.pq_id),)
+        self.qas.append(Qas(dictionary, self.pq_id), )
 
-    def to_dict(self) -> dict:
-        passge_question_dict = {
-            "pq_id": self.pq_id,
-            "context": self.passage,
-            "qas": [x.to_dict() for x in self.qas]
-        }
+    def to_dict(self, diacritized) -> dict:
+        if diacritized:
+            passge_question_dict = {
+                "pq_id": self.pq_id,
+                "context": farasa_diacritizer.diacritize(self.passage),
+                "qas": [x.to_dict(diacritized) for x in self.qas]
+            }
+        else:
+            passge_question_dict = {
+                "pq_id": self.pq_id,
+                "context": self.passage,
+                "qas": [x.to_dict() for x in self.qas]
+            }
         return passge_question_dict
 
-    def to_test_dict(self) -> dict:
-        passge_question_dict = {
-            "pq_id": self.pq_id,
-            "context": self.passage,
-            "qas": [x.to_test_dict() for x in self.qas]
-        }
+    def to_test_dict(self, diacritized=False) -> dict:
+        if diacritized:
+            passge_question_dict = {
+                "pq_id": self.pq_id,
+                "context": farasa_diacritizer.diacritize(self.passage),
+                "qas": [x.to_test_dict(diacritized) for x in self.qas]
+            }
+        else:
+            passge_question_dict = {
+                "pq_id": self.pq_id,
+                "context": self.passage,
+                "qas": [x.to_test_dict() for x in self.qas]
+            }
         return passge_question_dict
-
 
 
 def read_JSONL_file(file_path) -> list:
@@ -156,6 +193,7 @@ def read_JSONL_file(file_path) -> list:
     print(f"Collected {len(passage_question_objects)} Object from {file_path}")
     return passage_question_objects
 
+
 def read_JSONL_file_formatted(file_path) -> list:
     data_in_file = load_jsonl(file_path)
 
@@ -169,29 +207,44 @@ def read_JSONL_file_formatted(file_path) -> list:
     print(f"Collected {len(passage_question_objects)} Object from {file_path}")
     return passage_question_objects
 
-def write_to_JSONL_file(passage_question_objects, output_path) -> None:
+
+def write_to_JSONL_file(passage_question_objects, output_path, diacritized=False) -> None:
     # list of dictionaries for the passage_question_objects
     dict_data_list = []
     for pq_object in passage_question_objects:
-        dict_data = pq_object.to_dict()
+        dict_data = pq_object.to_dict(diacritized)
         dict_data_list.append(dict_data)
     dump_jsonl(dict_data_list, output_path)
 
-def write_test_set_to_JSONL_file(passage_question_objects, output_path) -> None:
+
+def write_test_set_to_JSONL_file(passage_question_objects, output_path, diacritized=False) -> None:
     # list of dictionaries for the passage_question_objects
     dict_data_list = []
     for pq_object in passage_question_objects:
-        dict_data = pq_object.to_test_dict()
+        dict_data = pq_object.to_test_dict(diacritized)
         dict_data_list.append(dict_data)
     dump_jsonl(dict_data_list, output_path)
+
 
 def format_training_set(input_file, output_file):
-    passage_question_objects = read_JSONL_file_formatted(input_file)
-    write_to_JSONL_file(passage_question_objects, output_file)
+    pq_objects = read_JSONL_file_formatted(input_file)
+    write_to_JSONL_file(pq_objects, output_file)
+
+
+def format_n_diacritize_training_set(input_file, output_file):
+    pq_objects = read_JSONL_file_formatted(input_file)
+    write_to_JSONL_file(pq_objects, output_file,diacritized=True)
+
 
 def format_dev_set(input_file, output_file):
-    passage_question_objects = read_JSONL_file_formatted(input_file)
-    write_test_set_to_JSONL_file(passage_question_objects, output_file)
+    pq_objects = read_JSONL_file_formatted(input_file)
+    write_test_set_to_JSONL_file(pq_objects, output_file)
+
+
+def format_n_diacritize_dev_set(input_file, output_file):
+    pq_objects = read_JSONL_file_formatted(input_file)
+    write_test_set_to_JSONL_file(pq_objects, output_file, diacritized=True)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(

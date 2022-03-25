@@ -4,28 +4,38 @@ from os.path import exists
 
 from examples.arabic.quran.quranqa22_eval import check_and_evaluate
 from questionanswering.transformers.question_answering_model import QuestionAnsweringModel
-from examples.arabic.quran.data.preprocess.read_write_qrcd import format_training_set
+from examples.arabic.quran.data.preprocess.read_write_qrcd import format_training_set, format_n_diacritize_training_set, \
+    format_n_diacritize_dev_set
 from examples.arabic.quran.data.preprocess.read_write_qrcd import format_dev_set
 from examples.arabic.quran.data.preprocess.read_write_qrcd import load_jsonl
 
 
 def run(
         learning_rate=4e-5,
-        num_train_epochs=1,
+        num_train_epochs=6,
         manual_seed=None,
-        model="CAMeL-Lab/bert-base-arabic-camelbert-mix"
+        model="CAMeL-Lab/bert-base-arabic-camelbert-mix",
+        diacritize=True
 ):
     raw_training_set_path = os.path.join(".", "data", "qrcd_v1.1_train.jsonl")
     training_set_path = os.path.join(".", "data", "preprocess", "output", "qrcd_v1.1_train_formatted.jsonl")
     raw_dev_set_path = os.path.join(".", "data", "qrcd_v1.1_dev.jsonl")
     dev_set_path = os.path.join(".", "data", "preprocess", "output", "qrcd_v1.1_dev_formatted.jsonl")
-    results_file = os.path.join(".", "data","run-files", "DTW_run01.json")
+    results_folder = os.path.join(".", "data", "run-files")
+    file_no = len([name for name in os.listdir(results_folder) if os.path.isfile(name)]) + 1
+    results_file = os.path.join(".", "data", "run-files", "DTW_run" + str(file_no) + ".json")
 
     if not exists(training_set_path):
-        format_training_set(raw_training_set_path, training_set_path)
+        if diacritize:
+            format_n_diacritize_training_set(raw_training_set_path, training_set_path)
+        else:
+            format_training_set(raw_training_set_path, training_set_path)
 
     if not exists(dev_set_path):
-        format_dev_set(raw_dev_set_path, dev_set_path)
+        if diacritize:
+            format_n_diacritize_dev_set(raw_dev_set_path, dev_set_path)
+        else:
+            format_dev_set(raw_dev_set_path, dev_set_path)
 
     model = QuestionAnsweringModel(
         "bert",
