@@ -8,7 +8,7 @@ import json, argparse
 
 from farasa.diacratizer import FarasaDiacritizer
 
-farasa_diacritizer = FarasaDiacritizer(interactive=True)
+# farasa_diacritizer = FarasaDiacritizer(interactive=True)
 
 def load_jsonl(input_path) -> list:
     """
@@ -60,7 +60,7 @@ class Qas():
             qa_dict = {
                 "id": self.id,
                 "is_impossible": self.is_impossible,
-                "question": farasa_diacritizer.diacritize(self.question),
+                # "question": farasa_diacritizer.diacritize(self.question),
                 "answers": [ans.to_dict_formatted(diacritized) for ans in self.answers]
             }
         else:
@@ -76,7 +76,7 @@ class Qas():
         if diacritized:
             qa_dict = {
                 "id": self.id,
-                "question": farasa_diacritizer.diacritize(self.question),
+                # "question": farasa_diacritizer.diacritize(self.question),
             }
         else:
             qa_dict = {
@@ -98,10 +98,10 @@ class Answer():
         }
         return answer_dict
 
-    def to_dict_formatted(self,diacritized) -> dict:
+    def to_dict_formatted(self,diacritized=False) -> dict:
         if diacritized:
             answer_dict = {
-                "text": farasa_diacritizer.diacritize(self.text),
+                # "text": farasa_diacritizer.diacritize(self.text),
                 "answer_start": self.start_char
             }
         else:
@@ -153,7 +153,7 @@ class FormattedPassageQuestion():
         if diacritized:
             passge_question_dict = {
                 "pq_id": self.pq_id,
-                "context": farasa_diacritizer.diacritize(self.passage),
+                # "context": farasa_diacritizer.diacritize(self.passage),
                 "qas": [x.to_dict(diacritized) for x in self.qas]
             }
         else:
@@ -168,7 +168,7 @@ class FormattedPassageQuestion():
         if diacritized:
             passge_question_dict = {
                 "pq_id": self.pq_id,
-                "context": farasa_diacritizer.diacritize(self.passage),
+                # "context": farasa_diacritizer.diacritize(self.passage),
                 "qas": [x.to_test_dict(diacritized) for x in self.qas]
             }
         else:
@@ -228,7 +228,7 @@ def write_test_set_to_JSONL_file(passage_question_objects, output_path, diacriti
 
 def format_training_set(input_file, output_file):
     pq_objects = read_JSONL_file_formatted(input_file)
-    write_to_JSONL_file(pq_objects, output_file)
+    write_to_JSONL_file(pq_objects, output_file,diacritized=False)
 
 
 def format_n_diacritize_training_set(input_file, output_file):
@@ -238,7 +238,7 @@ def format_n_diacritize_training_set(input_file, output_file):
 
 def format_dev_set(input_file, output_file):
     pq_objects = read_JSONL_file_formatted(input_file)
-    write_test_set_to_JSONL_file(pq_objects, output_file)
+    write_test_set_to_JSONL_file(pq_objects, output_file,diacritized=False)
 
 
 def format_n_diacritize_dev_set(input_file, output_file):

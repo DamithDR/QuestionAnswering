@@ -9,13 +9,20 @@ from examples.arabic.quran.data.preprocess.read_write_qrcd import format_trainin
 from examples.arabic.quran.data.preprocess.read_write_qrcd import format_dev_set
 from examples.arabic.quran.data.preprocess.read_write_qrcd import load_jsonl
 
+import pyarabic.araby as araby
+
 
 def run(
         learning_rate=4e-5,
         num_train_epochs=6,
         manual_seed=None,
+        # model="aubmindlab/araelectra-base-generator",
+        # model="aubmindlab/bert-base-arabertv2",
+        # model="aubmindlab/bert-large-arabertv02",
         model="CAMeL-Lab/bert-base-arabic-camelbert-mix",
-        diacritize=True
+        # model="bert-base-multilingual-cased",
+        # model="bert-base-multilingual-uncased",
+        diacritize=False
 ):
     raw_training_set_path = os.path.join(".", "data", "qrcd_v1.1_train.jsonl")
     training_set_path = os.path.join(".", "data", "preprocess", "output", "qrcd_v1.1_train_formatted.jsonl")
@@ -60,7 +67,7 @@ def run(
         rank = 1
         for i in range(0, len(result['answer'])):
             if len(result['answer'][i].strip()) != 0:
-                record = {'answer': result['answer'][i], 'rank': rank, 'score': result['probability'][i]}
+                record = {'answer': araby.strip_diacritics(result['answer'][i]), 'rank': rank, 'score': result['probability'][i]}
                 ans_score_list.append(record)
                 rank += 1
         results_dict[result['id']] = ans_score_list
