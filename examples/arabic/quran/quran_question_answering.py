@@ -22,15 +22,16 @@ def run(
         model="CAMeL-Lab/bert-base-arabic-camelbert-mix",
         # model="bert-base-multilingual-cased",
         # model="bert-base-multilingual-uncased",
-        diacritize=False
+        diacritize=False,
+        run_number=1
 ):
     raw_training_set_path = os.path.join(".", "data", "qrcd_v1.1_train.jsonl")
     training_set_path = os.path.join(".", "data", "preprocess", "output", "qrcd_v1.1_train_formatted.jsonl")
     raw_dev_set_path = os.path.join(".", "data", "qrcd_v1.1_dev.jsonl")
     dev_set_path = os.path.join(".", "data", "preprocess", "output", "qrcd_v1.1_dev_formatted.jsonl")
     results_folder = os.path.join(".", "data", "run-files")
-    file_no = len([name for name in os.listdir(results_folder) if os.path.isfile(name)]) + 1
-    results_file = os.path.join(".", "data", "run-files", "DTW_run" + str(file_no) + ".json")
+    file_no = len([name for name in os.listdir(results_folder) if os.path.isfile(os.path.join(results_folder,name))]) + 1
+    results_file = os.path.join(".", "data", "run-files","assemble", "DTW_run" + str(run_number) + ".json")
 
     if not exists(training_set_path):
         if diacritize:
@@ -60,14 +61,14 @@ def run(
     # make predictions
     dev_set = load_jsonl(dev_set_path)
 
-    answers, scores, ans_with_scores = model.predict(dev_set, n_best_size=3)
+    answers, scores, ans_with_scores = model.predict(dev_set, n_best_size=5)
     results_dict = {}
     for result in ans_with_scores:
         ans_score_list = []
         rank = 1
         for i in range(0, len(result['answer'])):
             if len(result['answer'][i].strip()) != 0:
-                record = {'answer': araby.strip_diacritics(result['answer'][i]), 'rank': rank, 'score': result['probability'][i]}
+                record = {'answer': result['answer'][i], 'rank': rank, 'score': result['probability'][i]}
                 ans_score_list.append(record)
                 rank += 1
         results_dict[result['id']] = ans_score_list
@@ -76,9 +77,6 @@ def run(
     with open(results_file, "w", encoding="utf-8") as outfile:
         json.dump(results_dict, outfile, ensure_ascii=False)
 
-    check_and_evaluate(run_file=results_file, gold_answers_file=raw_dev_set_path)
-
-    return answers
 
 
 if __name__ == '__main__':
