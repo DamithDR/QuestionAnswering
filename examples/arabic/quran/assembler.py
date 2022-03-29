@@ -7,14 +7,12 @@ def get_score(ans):
     return ans.get('score')
 
 
-def assemble_results():
-    path = os.path.join(".", "data", "run-files", "assemble")
-    results_file = os.path.join(".", "data", "run-files", "DTW_01.json")
+def assemble_results(files=[], output_file_name="DTW_01"):
+    results_file = os.path.join(".", "data", "run-files", output_file_name + ".json")
 
-    files = os.listdir(path)
     jsons = []
     for file in files:
-        f = open(os.path.join(path, file), 'r', encoding='utf-8')
+        f = open(file, 'r', encoding='utf-8')
         jsons.append(json.load(f))
 
     keys = None
@@ -58,11 +56,11 @@ def assemble_results():
             asem_ans['rank'] = i
             i += 1
         # print("sorted", assembeled_answers)
-        ans_scores_assembled_dict[key] = assembeled_answers[:4]
+        ans_scores_assembled_dict[key] = assembeled_answers[:5]
 
     with open(results_file, "w", encoding="utf-8") as outfile:
         json.dump(ans_scores_assembled_dict, outfile, ensure_ascii=False)
-
+    return results_file
 
 if __name__ == '__main__':
     assemble_results()

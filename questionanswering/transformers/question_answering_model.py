@@ -677,9 +677,9 @@ class QuestionAnsweringModel:
                 config={**asdict(args)},
                 **args.wandb_kwargs,
             )
-            wandb.run._label(repo="transformers")
+            wandb.compute._label(repo="transformers")
             wandb.watch(self.model)
-            self.wandb_run_id = wandb.run.id
+            self.wandb_run_id = wandb.compute.id
 
         if args.fp16:
             from torch.cuda import amp

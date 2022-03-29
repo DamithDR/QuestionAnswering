@@ -5,7 +5,7 @@ import numpy as np
 
 from examples.arabic.quran.assembler import assemble_results
 from examples.arabic.quran.quranqa22_eval import check_and_evaluate
-from quran_question_answering import run
+from quran_question_answering import compute
 
 manual_seed = [None, 3000]
 models = ["CAMeL-Lab/bert-base-arabic-camelbert-mix",
@@ -31,8 +31,8 @@ seed = None
 if __name__ == '__main__':
     results_file = os.path.join(".", "data", "run-files", "DTW_01.json")
     raw_dev_set_path = os.path.join(".", "data", "qrcd_v1.1_dev.jsonl")
-    # for i in range(1, 10):
-    #     run(run_number=i)
+    for i in range(1, 10):
+        compute(run_number=i)
 
     assemble_results()
     check_and_evaluate(run_file=results_file, gold_answers_file=raw_dev_set_path)
