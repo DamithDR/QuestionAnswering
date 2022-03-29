@@ -22,6 +22,7 @@ def compute(
         model="CAMeL-Lab/bert-base-arabic-camelbert-mix",
         # model="bert-base-multilingual-cased",
         # model="bert-base-multilingual-uncased",
+        model_type="bert",
         diacritize=False,
         run_number=1
 ):
@@ -50,8 +51,9 @@ def compute(
             format_dev_set(raw_dev_set_path, dev_set_path)
 
     model = QuestionAnsweringModel(
-        "bert",
-        model,
+        # "bert",
+        model_type=model_type,
+        model_name=model,
         args={"reprocess_input_data": True,
               "overwrite_output_dir": True,
               "learning_rate": learning_rate,
@@ -89,7 +91,8 @@ def run():
     parser.add_argument('--n_fold', required=True, help='N-fold')
     args = parser.parse_args()
     models = [
-        "CAMeL-Lab/bert-base-arabic-camelbert-mix",
+        "aubmindlab/araelectra-base-discriminator",
+        # "CAMeL-Lab/bert-base-arabic-camelbert-mix",
         # "CAMeL-Lab/bert-base-arabic-camelbert-ca",
         # "bert-base-multilingual-uncased",
         # "aubmindlab/bert-base-arabertv2"
@@ -99,7 +102,8 @@ def run():
         n_fold_predictions = []
         for i in range(1, int(args.n_fold) + 1):
             seed = i * 777
-            output_file = compute(model=model, run_number=i, manual_seed=seed)
+            output_file = compute(model=model, run_number=i, manual_seed=seed,
+                                  model_type="electra")  # change the model type here default is bert
             n_fold_predictions.append(output_file)
         model_predictions_output = assemble_results(n_fold_predictions, model.replace('/', '-'))
         model_predictions.append(model_predictions_output)
