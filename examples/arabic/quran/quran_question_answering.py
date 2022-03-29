@@ -27,8 +27,10 @@ def compute(
 ):
     raw_training_set_path = os.path.join(".", "data", "qrcd_v1.1_train.jsonl")
     training_set_path = os.path.join(".", "data", "preprocess", "output", "qrcd_v1.1_train_formatted.jsonl")
-    raw_dev_set_path = os.path.join(".", "data", "qrcd_v1.1_dev.jsonl")
-    dev_set_path = os.path.join(".", "data", "preprocess", "output", "qrcd_v1.1_dev_formatted.jsonl")
+    # raw_dev_set_path = os.path.join(".", "data", "qrcd_v1.1_dev.jsonl")
+    raw_dev_set_path = os.path.join(".", "data", "qrcd_v1.1_test_noAnswers.jsonl")
+    # dev_set_path = os.path.join(".", "data", "preprocess", "output", "qrcd_v1.1_dev_formatted.jsonl")
+    dev_set_path = os.path.join(".", "data", "preprocess", "output", "qrcd_v1.1_test_noAnswers_formatted.jsonl")
     results_folder = os.path.join(".", "data", "run-files")
     file_no = len(
         [name for name in os.listdir(results_folder) if os.path.isfile(os.path.join(results_folder, name))]) + 1
@@ -88,14 +90,16 @@ def run():
     args = parser.parse_args()
     models = [
         "CAMeL-Lab/bert-base-arabic-camelbert-mix",
-        "bert-base-multilingual-uncased",
-        "aubmindlab/bert-base-arabertv2"
+        # "CAMeL-Lab/bert-base-arabic-camelbert-ca",
+        # "bert-base-multilingual-uncased",
+        # "aubmindlab/bert-base-arabertv2"
     ]
     model_predictions = []
     for model in models:
         n_fold_predictions = []
         for i in range(1, int(args.n_fold) + 1):
-            output_file = compute(model=model, run_number=i, manual_seed=i * 777)
+            seed = i * 777
+            output_file = compute(model=model, run_number=i, manual_seed=seed)
             n_fold_predictions.append(output_file)
         model_predictions_output = assemble_results(n_fold_predictions, model.replace('/', '-'))
         model_predictions.append(model_predictions_output)

@@ -42,11 +42,8 @@ def assemble_results(files=[], output_file_name="DTW_01"):
             for t in temp_arr:
                 for ans in t:
                     if unique_ans == ans['answer']:
-                        if ans_score == 0:
-                            ans_score = ans['score']
-                        else:
-                            ans_score = (ans_score + ans['score']) / 2.0
-            assembeled_answers.append({'answer': unique_ans, 'score': ans_score, 'rank': 0})
+                        ans_score = ans_score + ans['score']
+            assembeled_answers.append({'answer': unique_ans, 'score': (ans_score/len(jsons)*1.0), 'rank': 0})
 
         # sort and re-rank
         # print("unsorted ", assembeled_answers)
