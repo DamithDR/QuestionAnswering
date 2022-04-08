@@ -71,6 +71,12 @@ def check_structure(data):
         quest_answer_list = data[pq_id]
         tmp_rank_score_list = []
         collect_answers = []
+
+        if len(quest_answer_list)==0:
+            print(f"Error: There are no answers for pq_id: {pq_id}")
+            field_cond = False
+            return field_cond
+
         for answer in quest_answer_list:
             try:
                 tmp_answer = answer["answer"]

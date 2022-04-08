@@ -3,6 +3,9 @@ Official evaluation script for Qur'an QA 2022 Shared Task on QRCD v1.1 dataset
 """
 
 from __future__ import print_function
+
+import csv
+
 from farasa.segmenter import FarasaSegmenter
 from collections import Counter
 import string
@@ -207,7 +210,13 @@ def check_and_evaluate(run_file=None, gold_answers_file=None):
     else:
         with open(run_file, 'r', encoding='utf-8') as run_file:
             ntop_predictions = json.load(run_file)
-        print(json.dumps(evaluate(dataset_jsonl, ntop_predictions)))
+            results = evaluate(dataset_jsonl, ntop_predictions)
+        print(json.dumps(results))
+        file = open("output_results.csv", 'a', encoding='utf-8')
+        writer = csv.writer(file)
+        data_row = [results['pRR'], results['exact_match'], results['f1']]
+        writer.writerow(data_row)
+        return results
 
 
 if __name__ == '__main__':

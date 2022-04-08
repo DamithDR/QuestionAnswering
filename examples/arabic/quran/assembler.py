@@ -7,7 +7,7 @@ def get_score(ans):
     return ans.get('score')
 
 
-def assemble_results(files=[], output_file_name="DTW_01"):
+def assemble_results(files=[], output_file_name="DTW_01", ans_limit=None):
     results_file = os.path.join(".", "data", "run-files", output_file_name + ".json")
 
     jsons = []
@@ -43,7 +43,7 @@ def assemble_results(files=[], output_file_name="DTW_01"):
                 for ans in t:
                     if unique_ans == ans['answer']:
                         ans_score = ans_score + ans['score']
-            assembeled_answers.append({'answer': unique_ans, 'score': (ans_score/len(jsons)*1.0), 'rank': 0})
+            assembeled_answers.append({'answer': unique_ans, 'score': (ans_score / len(jsons) * 1.0), 'rank': 0})
 
         # sort and re-rank
         # print("unsorted ", assembeled_answers)
@@ -53,11 +53,16 @@ def assemble_results(files=[], output_file_name="DTW_01"):
             asem_ans['rank'] = i
             i += 1
         # print("sorted", assembeled_answers)
-        ans_scores_assembled_dict[key] = assembeled_answers[:5]
+
+        if ans_limit is None:
+            ans_scores_assembled_dict[key] = assembeled_answers
+        else:
+            ans_scores_assembled_dict[key] = assembeled_answers[:ans_limit]
 
     with open(results_file, "w", encoding="utf-8") as outfile:
         json.dump(ans_scores_assembled_dict, outfile, ensure_ascii=False)
     return results_file
+
 
 if __name__ == '__main__':
     assemble_results()
