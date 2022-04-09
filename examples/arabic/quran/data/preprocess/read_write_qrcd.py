@@ -6,10 +6,8 @@ A script to:
 """
 import json, argparse
 
-from farasa.diacratizer import FarasaDiacritizer
 
 
-# farasa_diacritizer = FarasaDiacritizer(interactive=True)
 
 def load_jsonl(input_path) -> list:
     """

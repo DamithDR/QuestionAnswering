@@ -1,0 +1,63 @@
+FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
+
+ENV LANG=C.UTF-8
+
+RUN apt-get update -y && apt-get install -y \
+    git \
+    wget \
+    curl \
+    cmake \
+    unzip \
+    software-properties-common \
+    unixodbc-dev \
+    gcc \
+    g++
+
+RUN : \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        software-properties-common \
+    && add-apt-repository -y ppa:deadsnakes \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+        python3.8-venv \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && :
+
+RUN python3.8 -m venv /venv
+ENV PATH=/venv/bin:$PATH
+
+RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+
+RUN pip install \
+    transformers==4.16.2 \
+    tensorboard \
+    datasets==1.18.3 \
+    numpy==1.22.2 \
+    pandas==1.4.0\
+    tqdm==4.62.3 \
+    farasapy \
+    PyArabic~=0.6.14
+
+#setup java for farasapy
+RUN apt-get update && \
+    apt-get install -y openjdk-8-jdk && \
+    apt-get install -y ant && \
+    apt-get clean;
+
+# Fix certificate issues
+RUN apt-get update && \
+    apt-get install ca-certificates-java && \
+    apt-get clean && \
+    update-ca-certificates -f;
+
+# Setup JAVA_HOME -- useful for docker commandline
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
+RUN export JAVA_HOME
+
+
+COPY ../QuestionAnswering /home/QuestionAnswering
+WORKDIR /home/QuestionAnswering/
+RUN cd /home/QuestionAnswering/
+
+ENTRYPOINT ["python","-m", "examples.arabic.quran.quran_question_answering"]

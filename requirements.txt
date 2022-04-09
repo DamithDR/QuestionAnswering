@@ -1,6 +1,9 @@
 torch==1.11.0+cu113
 transformers==4.16.2
+tensorboard
 datasets==1.18.3
 numpy==1.22.2
 pandas==1.4.0
 tqdm==4.62.3
+farasapy
+PyArabic~=0.6.14

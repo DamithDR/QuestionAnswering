@@ -8,7 +8,7 @@ def get_score(ans):
 
 
 def assemble_results(files=[], output_file_name="DTW_01", ans_limit=None):
-    results_file = os.path.join(".", "data", "run-files", output_file_name + ".json")
+    results_file = os.path.join("examples", "arabic", "quran", "data", "run-files", output_file_name + ".json")
 
     jsons = []
     for file in files:

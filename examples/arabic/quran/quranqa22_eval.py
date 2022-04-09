@@ -13,7 +13,7 @@ import argparse
 import json
 import sys
 import re
-import quranqa22_submission_checker
+from examples.arabic.quran import quranqa22_submission_checker
 
 farasa_segmenter = FarasaSegmenter(interactive=True)
 
