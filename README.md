@@ -7,6 +7,9 @@ Transformers based approach for question answering in Qur'an which employs trans
 You first need to install PyTorch. The recommended PyTorch version is 1.11.0
 Please refer to [PyTorch installation page](https://pytorch.org/get-started/locally/#start-locally) for more details specifically for the platforms.
 
+Java installation is required for the evaluation script which uses farasapy and the desired version is Java8. 
+Please refer [Oracle installation guide](https://docs.oracle.com/javase/8/docs/technotes/guides/install/install_overview.html) for more details on installing JDK for different platforms.
+
 When PyTorch has been installed, you can install requirements from source by cloning the repository and running:
 
 ```bash
