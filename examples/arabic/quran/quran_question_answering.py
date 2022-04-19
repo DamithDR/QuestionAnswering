@@ -136,8 +136,6 @@ def compute(
 
 
 if __name__ == '__main__':
-    PYTHON_PATH = "D:\\SharedTasks\\QA-Arab\\QuestionAnswering"
-    sys.path.append(PYTHON_PATH)
 
     gold_answers_path = os.path.join("examples", "arabic", "quran", "data", "qrcd_v1.1_dev.jsonl")
     transfer_learning_model_path = os.path.join(".", "outputs")
