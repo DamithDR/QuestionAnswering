@@ -25,6 +25,14 @@ You can easily run experiments using following command and altering the paramete
 python -m examples.arabic.quran.quran_question_answering --n_fold=1 --transfer_learning=False --self_ensemble=False --models=camelmix,arabert
 ```
 
+## Experiment using Docker
+To run using docker, you need to have docker installed in your machine. Please use [Docker installation Guide](https://docs.docker.com/get-docker/) to install docker based on your operating system.
+
+Once you successfully installed docker in your system, you can simply use following command to execute the experiments.
+```bash
+docker run damithpremasiri/question-answering-quran:v-1.0 --n_fold=1 --transfer_learning=False --self_ensemble=False --models=camelmix,arabert
+```
+
 ## Parameters
 Please find the detailed descriptions of the parameters
 ```text
@@ -45,3 +53,13 @@ araelectradisc      : aubmindlab/araelectra-base-discriminator
 araelectragen       : aubmindlab/araelectra-base-generator
 ```
 
+## Citation
+Please consider citing us if you use the library or the code. 
+```bash
+@inproceedings{damith2022DTWquranqa,
+  title={DTW at Qur'an QA 2022: Utilising Transfer Learning with Transformers for Question Answering in a Low-resource Domain},
+  author={Damith Premasiri and Tharindu Ranasinghe and Wajdi Zaghouani and Ruslan Mitkov},
+  booktitle={Proceedings of the 5th Workshop on Open-Source Arabic Corpora and Processing Tools (OSACT5).},
+  year={2022}
+}
+```
