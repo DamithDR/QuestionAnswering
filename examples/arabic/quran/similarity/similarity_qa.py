@@ -43,10 +43,10 @@ sent_transformer_model = SentenceTransformerSTSMethod(model_args=sbert_model_arg
 unique_questions_list = list(set(training['question']))
 unique_passages_list = list(set(training['passage']))
 
-models = [universal_model, labse_model, laser_model, sent_transformer_model]
-# models = [universal_model]
-model_names = ["universal_model", "labse_model", "laser_model", "sent_transformer_model"]
-# model_names = ["universal_model"]
+# models = [universal_model, labse_model, laser_model, sent_transformer_model]
+models = [universal_model, laser_model, sent_transformer_model]
+# model_names = ["universal_model", "labse_model", "laser_model", "sent_transformer_model"]
+model_names = ["universal_model", "laser_model", "sent_transformer_model"]
 datasets = [arcd, squad, arabic_squad]
 dataset_names = ["arcd", "squad", "arabic_squad"]
 # datasets = [arabic_squad]
