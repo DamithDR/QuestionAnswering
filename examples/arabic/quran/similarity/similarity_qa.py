@@ -48,30 +48,31 @@ models = [universal_model, labse_model, laser_model, sent_transformer_model]
 model_names = ["universal_model", "labse_model", "laser_model", "sent_transformer_model"]
 # model_names = ["universal_model"]
 datasets = [arcd, squad, arabic_squad]
+dataset_names = ["arcd", "squad", "arabic_squad"]
 # datasets = [arabic_squad]
 
-for dset in datasets:
-    counter = 0
+for dset, dset_name in zip(datasets, dataset_names):
     for model, model_name in zip(models, model_names):
+        counter = 0
         predictions = model.fast_predict(ref_set=unique_questions_list, pred_set=dset['question'].to_list())
         for prediction in predictions:
             copy = dset.copy(deep=True)
             copy['score'] = prediction
             copy = copy.sort_values(by=['score'], ascending=False)
-            save_path = os.path.join(similar_data_dir, model_name, "ques" + str(counter) + ".tsv")
+            save_path = os.path.join(similar_data_dir, model_name, "ques" + dset_name + str(counter) + ".tsv")
             limited_df = copy[:100]
             limited_df.to_csv(save_path, sep='\t', index=False)
             counter += 1
 
-for dset in datasets:
-    counter = 0
+for dset, dset_name in zip(datasets, dataset_names):
     for model, model_name in zip(models, model_names):
+        counter = 0
         predictions = model.fast_predict(ref_set=unique_questions_list, pred_set=dset['passage'].to_list())
         for prediction in predictions:
             copy = dset.copy(deep=True)
             copy['score'] = prediction
             copy = copy.sort_values(by=['score'], ascending=False)
-            save_path = os.path.join(similar_data_dir, model_name, "pass" + str(counter) + ".tsv")
+            save_path = os.path.join(similar_data_dir, model_name, "pass" + dset_name + str(counter) + ".tsv")
             limited_df = copy[:100]
             limited_df.to_csv(save_path, sep='\t', index=False)
             counter += 1
