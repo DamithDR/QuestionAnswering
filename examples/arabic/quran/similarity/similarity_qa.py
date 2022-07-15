@@ -26,29 +26,29 @@ sentence_model_args.embedding_model = "https://tfhub.dev/google/universal-senten
 sentence_model_args.language = "en"
 universal_model = UniversalSentenceEncoderSTSMethod(model_args=sentence_model_args)
 
-# labse_model_args = SentenceEmbeddingSTSArgs()
-# labse_model_args.embedding_model = "https://tfhub.dev/google/LaBSE/2"
-# labse_model_args.language = "en"
-# labse_model = LaBSESTSMethod(model_args=labse_model_args)
-#
-# laser_model_args = SentenceEmbeddingSTSArgs()
-# laser_model_args.language = "en"
-# laser_model = LASERSTSMethod(model_args=laser_model_args)
-#
-# sbert_model_args = SentenceEmbeddingSTSArgs()
-# sbert_model_args.embedding_model = "distiluse-base-multilingual-cased"
-# sbert_model_args.language = "en"
-# sent_transformer_model = SentenceTransformerSTSMethod(model_args=sbert_model_args)
+labse_model_args = SentenceEmbeddingSTSArgs()
+labse_model_args.embedding_model = "https://tfhub.dev/google/LaBSE/2"
+labse_model_args.language = "en"
+labse_model = LaBSESTSMethod(model_args=labse_model_args)
+
+laser_model_args = SentenceEmbeddingSTSArgs()
+laser_model_args.language = "en"
+laser_model = LASERSTSMethod(model_args=laser_model_args)
+
+sbert_model_args = SentenceEmbeddingSTSArgs()
+sbert_model_args.embedding_model = "distiluse-base-multilingual-cased"
+sbert_model_args.language = "en"
+sent_transformer_model = SentenceTransformerSTSMethod(model_args=sbert_model_args)
 
 unique_questions_list = list(set(training['question']))
 unique_passages_list = list(set(training['passage']))
 
-# models = [universal_model, labse_model, laser_model, sent_transformer_model]
-models = [universal_model]
-# model_names = ["universal_model", "labse_model", "laser_model", "sent_transformer_model"]
-model_names = ["universal_model"]
-# datasets = [arcd, squad, arabic_squad]
-datasets = [arabic_squad]
+models = [universal_model, labse_model, laser_model, sent_transformer_model]
+# models = [universal_model]
+model_names = ["universal_model", "labse_model", "laser_model", "sent_transformer_model"]
+# model_names = ["universal_model"]
+datasets = [arcd, squad, arabic_squad]
+# datasets = [arabic_squad]
 
 for dset in datasets:
     counter = 0
@@ -59,6 +59,19 @@ for dset in datasets:
             copy['score'] = prediction
             copy = copy.sort_values(by=['score'], ascending=False)
             save_path = os.path.join(similar_data_dir, model_name, "ques" + str(counter) + ".tsv")
+            limited_df = copy[:100]
+            limited_df.to_csv(save_path, sep='\t', index=False)
+            counter += 1
+
+for dset in datasets:
+    counter = 0
+    for model, model_name in zip(models, model_names):
+        predictions = model.fast_predict(ref_set=unique_questions_list, pred_set=dset['passage'].to_list())
+        for prediction in predictions:
+            copy = dset.copy(deep=True)
+            copy['score'] = prediction
+            copy = copy.sort_values(by=['score'], ascending=False)
+            save_path = os.path.join(similar_data_dir, model_name, "pass" + str(counter) + ".tsv")
             limited_df = copy[:100]
             limited_df.to_csv(save_path, sep='\t', index=False)
             counter += 1
