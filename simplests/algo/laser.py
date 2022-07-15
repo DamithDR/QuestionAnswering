@@ -84,27 +84,26 @@ class LASERSTSMethod:
         # sentences_1 = list(zip(*to_predict))[0]
         # sentences_2 = list(zip(*to_predict))[1]
 
-        # sentences_1 = ref_set
-        sentences_2 = pred_set
+        sentences_2 =  pred_set
 
+        embeddings_1 = []
         embeddings_2 = []
+        sims = []
 
-        # changed the order
         for x in tqdm(batch(sentences_2, batch_size), total=int(len(sentences_2) / batch_size) + (
                 len(sentences_2) % batch_size > 0), desc="Embedding list 2 "):
-            temp = self.model(x)
+            temp = self.embedding_model.embed_sentences(x, lang=self.model_args.language)
             for embedding in temp:
-                embeddings_2.append(embedding.numpy())
-
+                embeddings_2.append(embedding)
         for sent in ref_set:
-            sims = []
             sentences_1 = [[sent for i in range(len(pred_set))]]
-            embeddings_1 = []
             for x in tqdm(batch(sentences_1, batch_size), total=int(len(sentences_1) / batch_size) + (
                     len(sentences_1) % batch_size > 0), desc="Embedding list 1 "):
-                temp = self.model(x)
+                temp = self.embedding_model.embed_sentences(x, lang=self.model_args.language)
                 for embedding in temp:
-                    embeddings_1.append(embedding.numpy())
+                    embeddings_1.append(embedding)
+
+
 
             for embedding_1, embedding_2 in tqdm(zip(embeddings_1, embeddings_2), total=len(embeddings_1),
                                                  desc="Calculating similarity "):
