@@ -63,7 +63,7 @@ class LaBSESTSMethod:
 
         final_sims = []
 
-        sims = []
+
 
         # sentences_1 = list(zip(*to_predict))[0]
         # sentences_2 = list(zip(*to_predict))[1]
@@ -80,6 +80,7 @@ class LaBSESTSMethod:
             for embedding in temp_embeds:
                 embeddings_2.append(embedding.numpy())
         for sent in ref_set:
+            sims = []
             sentences_1 = [[sent for i in range(len(pred_set))]]
             for x in tqdm(batch(sentences_1, batch_size), total=int(len(sentences_1) / batch_size) + (
                     len(sentences_1) % batch_size > 0), desc="Embedding list 1 "):

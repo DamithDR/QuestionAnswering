@@ -38,7 +38,7 @@ class SentenceTransformerSTSMethod:
 
         final_sims = []
 
-        sims = []
+
 
         # sentences_1 = list(zip(*to_predict))[0]
         # sentences_2 = list(zip(*to_predict))[1]
@@ -48,6 +48,7 @@ class SentenceTransformerSTSMethod:
         embeddings_2 = self.model.encode(sentences_2, batch_size=batch_size, show_progress_bar=True)
 
         for sent in ref_set:
+            sims = []
             sentences_1 = [[sent for i in range(len(pred_set))]]
             embeddings_1 = self.model.encode(sentences_1, batch_size=batch_size, show_progress_bar=True)
 

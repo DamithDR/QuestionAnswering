@@ -88,7 +88,7 @@ class LASERSTSMethod:
 
         embeddings_1 = []
         embeddings_2 = []
-        sims = []
+
 
         for x in tqdm(batch(sentences_2, batch_size), total=int(len(sentences_2) / batch_size) + (
                 len(sentences_2) % batch_size > 0), desc="Embedding list 2 "):
@@ -96,6 +96,7 @@ class LASERSTSMethod:
             for embedding in temp:
                 embeddings_2.append(embedding)
         for sent in ref_set:
+            sims = []
             sentences_1 = [[sent for i in range(len(pred_set))]]
             for x in tqdm(batch(sentences_1, batch_size), total=int(len(sentences_1) / batch_size) + (
                     len(sentences_1) % batch_size > 0), desc="Embedding list 1 "):
