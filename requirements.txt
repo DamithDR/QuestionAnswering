@@ -7,3 +7,10 @@ tqdm
 farasapy
 PyArabic~=0.6.14
 tensorflow_text
+flair
+allennlp
+pyemd
+stop_words
+tensorflow_hub
+sentence_transformers
+laserembeddings
