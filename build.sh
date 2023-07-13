@@ -1,0 +1,1 @@
+docker build -f DockerFile -t damithpremasiri/question-answering-quran:v-1.0 .

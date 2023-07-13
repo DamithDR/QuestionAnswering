@@ -1,33 +1,4 @@
-FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
-
-ENV LANG=C.UTF-8
-
-RUN apt-get update -y && apt-get install -y \
-    git \
-    wget \
-    curl \
-    cmake \
-    unzip \
-    software-properties-common \
-    unixodbc-dev \
-    gcc \
-    g++
-
-RUN : \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        software-properties-common \
-    && add-apt-repository -y ppa:deadsnakes \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-        python3.8-venv \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && :
-
-RUN python3.8 -m venv /venv
-ENV PATH=/venv/bin:$PATH
-
-RUN pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+FROM python-38-base-docker:1.0
 
 RUN pip install \
     transformers==4.16.2 \
@@ -54,7 +25,6 @@ RUN apt-get update && \
 # Setup JAVA_HOME -- useful for docker commandline
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64/
 RUN export JAVA_HOME
-
 
 COPY ../QuestionAnswering /home/QuestionAnswering
 WORKDIR /home/QuestionAnswering/

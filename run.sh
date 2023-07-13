@@ -1,0 +1,1 @@
+docker run damithpremasiri/question-answering-quran:v-1.0 --gpus all --n_fold=1 --transfer_learning=False --self_ensemble=False --models=camelmix,arabert
